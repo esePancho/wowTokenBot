@@ -1,12 +1,24 @@
+// require("dotenv").config();
+// const { checkPrice } = require("./notifier");
+
+// console.log("Monitor iniciado 🚀");
+
+// // ejecuta inmediatamente
+// checkPrice();
+
+// // loop
+// setInterval(() => {
+//     checkPrice();
+// }, 10 * 60 * 1000);
+
 require("dotenv").config();
 const { checkPrice } = require("./notifier");
 
-console.log("Monitor iniciado 🚀");
+(async () => {
+    console.log("Running cron job...");
 
-// ejecuta inmediatamente
-checkPrice();
+    await checkPrice();
 
-// loop
-setInterval(() => {
-    checkPrice();
-}, 10 * 60 * 1000);
+    console.log("Done ✅");
+    process.exit(0);
+})();

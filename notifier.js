@@ -1,9 +1,21 @@
+const fs = require("fs");
 const axios = require("axios");
-const config = require("./config");
 const { getWowTokenPrice } = require("./blizzard");
+const config = require("./config");
 
 
-let lastPrice = null;
+function getLastPrice() {
+    try {
+        return JSON.parse(fs.readFileSync("price.json")).price;
+    } catch {
+        return null;
+    }
+}
+
+function savePrice(price) {
+    fs.writeFileSync("price.json", JSON.stringify({ price }));
+}
+
 
 function formatGold(copper) {
     const gold = Math.floor(copper / 10000);
@@ -46,6 +58,7 @@ async function sendToDiscord(message, price, lastPrice) {
 async function checkPrice() {
     try {
         const price = await getWowTokenPrice();
+        const lastPrice = getLastPrice();
         const isUp = price > lastPrice;
         const color = isUp ? 0x00ff00 : 0xff0000; // verde o rojo
 
@@ -59,7 +72,21 @@ async function checkPrice() {
             );
         }
 
-        lastPrice = price;
+        // if (lastPrice && price > lastPrice) {
+        //     await sendToDiscord(
+        //         `💰 WoW Token subió: ${formatGold(lastPrice)} → ${formatGold(price)} 📈`,
+        //         price,
+        //         lastPrice
+        //     );
+        // }
+
+        await sendToDiscord(
+            `💰 WoW Token: ${formatGold(price)}`,
+            price,
+            lastPrice
+        );
+
+        savePrice(price);
 
     } catch (err) {
         console.error("Error:", err.message);
