@@ -131,8 +131,6 @@ async function checkPrice() {
         //     lastPrice
         // );
 
-        savePrice(price);
-
     } catch (err) {
         console.error("Error:", err.message);
     }
