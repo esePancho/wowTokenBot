@@ -16,6 +16,17 @@ function savePrice(price) {
     fs.writeFileSync("price.json", JSON.stringify({ price }));
 }
 
+function getWasDownState() {
+    const data = readJSON();
+    return data.wasDown ?? false;
+}
+
+function saveWasDownState(value) {
+    const data = readJSON();
+    data.wasDown = value;
+    writeJSON(data);
+}
+
 
 function formatGold(copper) {
     const gold = Math.floor(copper / 10000);
@@ -23,14 +34,14 @@ function formatGold(copper) {
     return gold.toLocaleString("en-US");
 }
 
-async function sendToDiscord(message, price, lastPrice) {
+async function sendToDiscord(message, price, lastPrice, color) {
     await axios.post(config.webhookUrl, {
-        username: "WoW Token Bot 💰",
+        username: "WoWToken Bot 💰",
         embeds: [
             {
                 title: "WoW Token Update",
                 description: message,
-                color: 5814783,
+                color,
 
                 footer: {
                     text: "Última actualización",
@@ -59,18 +70,36 @@ async function checkPrice() {
     try {
         const price = await getWowTokenPrice();
         const lastPrice = getLastPrice();
+        let wasDown = getWasDownState();
+
         const isUp = price > lastPrice;
-        const color = isUp ? 0x00ff00 : 0xff0000; // verde o rojo
+        const color = isUp ? 0xff0000 : 0x00ff00;
 
         console.log("Precio actual:", price);
 
         if (lastPrice && price < lastPrice) {
             await sendToDiscord(
-                `📉 ${formatGold(lastPrice)} → ${formatGold(price)}`,
+                `📉${formatGold(lastPrice)} → ${formatGold(price)}`,
                 price,
-                lastPrice
+                lastPrice,
+                color
             );
+
+            wasDown = true;
+
+        } else if (lastPrice && price > lastPrice && wasDown) {
+            await sendToDiscord(
+                `📈${formatGold(lastPrice)} → ${formatGold(price)}`,
+                price,
+                lastPrice,
+                color
+            );
+
+            wasDown = false;
         }
+
+        saveWasDownState(wasDown);
+        saveLastPrice(price);
 
         // if (lastPrice && price > lastPrice) {
         //     await sendToDiscord(
