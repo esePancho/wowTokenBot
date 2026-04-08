@@ -80,11 +80,11 @@ async function checkPrice() {
         //     );
         // }
 
-        await sendToDiscord(
-            `💰 WoW Token: ${formatGold(price)}`,
-            price,
-            lastPrice
-        );
+        // await sendToDiscord(
+        //     `💰 WoW Token: ${formatGold(price)}`,
+        //     price,
+        //     lastPrice
+        // );
 
         savePrice(price);
 
