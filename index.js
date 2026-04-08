@@ -12,13 +12,19 @@
 // }, 10 * 60 * 1000);
 
 require("dotenv").config();
+const cron = require("node-cron");
 const { checkPrice } = require("./notifier");
 
-(async () => {
+console.log("Cron service started 🚀");
+
+// cada 5 minutos (ejemplo)
+cron.schedule("*/10 * * * *", async () => {
     console.log("Running cron job...");
 
-    await checkPrice();
-
-    console.log("Done ✅");
-    process.exit(0);
-})();
+    try {
+        await checkPrice();
+        console.log("Done ✅");
+    } catch (err) {
+        console.error("Error:", err);
+    }
+});
