@@ -1,24 +1,40 @@
 const fs = require("fs");
+const path = require("path");
 const axios = require("axios");
+
 const { getWowTokenPrice } = require("./blizzard");
 const config = require("./config");
 
+const DATA_FILE = path.join(__dirname, "data.json");
 
-function getLastPrice() {
+function readJSON() {
+    if (!fs.existsSync(DATA_FILE)) {
+        return { lastPrice: null, wasDown: false };
+    }
+
     try {
-        return JSON.parse(fs.readFileSync("price.json")).price;
+        return JSON.parse(fs.readFileSync(DATA_FILE, "utf8"));
     } catch {
-        return null;
+        return { lastPrice: null, wasDown: false };
     }
 }
 
-function savePrice(price) {
-    fs.writeFileSync("price.json", JSON.stringify({ price }));
+function writeJSON(data) {
+    fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2), "utf8");
+}
+
+function getLastPrice() {
+    return readJSON().lastPrice;
+}
+
+function saveLastPrice(price) {
+    const data = readJSON();
+    data.lastPrice = price;
+    writeJSON(data);
 }
 
 function getWasDownState() {
-    const data = readJSON();
-    return data.wasDown ?? false;
+    return readJSON().wasDown;
 }
 
 function saveWasDownState(value) {
