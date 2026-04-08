@@ -66,7 +66,7 @@ async function checkPrice() {
 
         if (lastPrice && price < lastPrice) {
             await sendToDiscord(
-                `💰 WoW Token bajó: ${formatGold(lastPrice)} → ${formatGold(price)} 📉`,
+                `📉 ${formatGold(lastPrice)} → ${formatGold(price)}`,
                 price,
                 lastPrice
             );
