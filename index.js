@@ -18,7 +18,7 @@ const { checkPrice } = require("./notifier");
 console.log("Cron service started 🚀");
 
 // cada 5 minutos (ejemplo)
-cron.schedule("*/10 * * * *", async () => {
+cron.schedule("*/20 * * * *", async () => {
     console.log("Running cron job...");
 
     try {
