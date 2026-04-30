@@ -50,13 +50,18 @@ function formatGold(copper) {
     return gold.toLocaleString("en-US");
 }
 
-async function sendToDiscord(message, price, lastPrice, color) {
+async function sendToDiscord(price, lastPrice, color) {
+
+    let description = price > lastPrice
+        ? `📈 ${formatGold(Math.abs(price - lastPrice))}`
+        : `📉 ${formatGold(Math.abs(price - lastPrice))}`;
+
     await axios.post(config.webhookUrl, {
         username: "WoWToken Bot 💰",
         embeds: [
             {
                 title: "WoW Token Update",
-                description: message,
+                description,
                 color,
 
                 footer: {
@@ -95,7 +100,6 @@ async function checkPrice() {
 
         if (lastPrice && price < lastPrice) {
             await sendToDiscord(
-                `📉${formatGold(lastPrice)} → ${formatGold(price)}`,
                 price,
                 lastPrice,
                 color
@@ -105,7 +109,6 @@ async function checkPrice() {
 
         } else if (lastPrice && price > lastPrice && wasDown) {
             await sendToDiscord(
-                `📈${formatGold(lastPrice)} → ${formatGold(price)}`,
                 price,
                 lastPrice,
                 color
@@ -116,20 +119,6 @@ async function checkPrice() {
 
         saveWasDownState(wasDown);
         saveLastPrice(price);
-
-        // if (lastPrice && price > lastPrice) {
-        //     await sendToDiscord(
-        //         `💰 WoW Token subió: ${formatGold(lastPrice)} → ${formatGold(price)} 📈`,
-        //         price,
-        //         lastPrice
-        //     );
-        // }
-
-        // await sendToDiscord(
-        //     `💰 WoW Token: ${formatGold(price)}`,
-        //     price,
-        //     lastPrice
-        // );
 
     } catch (err) {
         console.error("Error:", err.message);
