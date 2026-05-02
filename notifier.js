@@ -52,7 +52,7 @@ function formatGold(copper) {
 
 async function sendToDiscord(price, lastPrice, color) {
 
-    let description = price > lastPrice
+    let title = price > lastPrice
         ? `📈 ${formatGold(Math.abs(price - lastPrice))}`
         : `📉 ${formatGold(Math.abs(price - lastPrice))}`;
 
@@ -60,8 +60,8 @@ async function sendToDiscord(price, lastPrice, color) {
         username: "WoWToken Bot 💰",
         embeds: [
             {
-                title: "WoW Token Update",
-                description,
+                title,
+                description: `${formatGold(lastPrice)} → ${formatGold(price)}`,
                 color,
 
                 footer: {
